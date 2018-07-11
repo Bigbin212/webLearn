@@ -19,12 +19,17 @@
      * @constructor
      */
     function Watcher(vm,node,name) {
+        //标志变量。判断是否要进行观察者的注册。
         Moniter.target=this;
+        //要改变的节点
         this.node=node;
+        //响应式数据的键名
         this.name=name;
+        //vue实例
         this.vm=vm;
         //初始化数据和注册观察者
         this.update();
+        //注册完成，取消标志变量
         Moniter.target=null;
     }
     //更新数据
@@ -37,13 +42,16 @@
      * @constructor
      */
     function Moniter() {
+        //保存观察者的数组
         this.watchers=[];
     }
+    //触发观察者
     Moniter.prototype.dispatch=function () {
         this.watchers.forEach(function (watcher) {
             watcher.update();
         })
     };
+    //注册观察者
     Moniter.prototype.addWatcher=function (target) {
         this.watchers.push(target);
     };
@@ -77,7 +85,9 @@
         Object.keys(vm.data).forEach(function (name) {
             //保存未被访问器属性覆时，数据属性的值。
             let value=vm.data[name];
+            //创建监听者
             let mo=new Moniter();
+            //数据劫持
             Object.defineProperty(vm,name,{
                 set:function (newValue) {
                     if(value===newValue) return;
