@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+
+    .container {
+        height: 100vh;
+        width: 100vw;
+        background: bisque;
+    }
+
+    .item {
+        height: 50vh;
+        width: 50vh;
+        background: aqua;
+    }
+
+    /*第一中方法*/
+    .flex {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /*第二种方法*/
+    .absolut {
+        position: absolute;
+        margin: auto;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+    }
+
+    /*第三种方法*/
+    .relative {
+        position: relative;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
+<body class="container">
+<div class="item relative"></div>
+</body>
+</html>

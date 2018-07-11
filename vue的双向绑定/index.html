@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>vue的双向绑定实现原理</title>
+</head>
+<body>
+<div id="app">
+    <input type="text" v-model="text">
+    {{text}}
+</div>
+</body>
+<script>
+    /**
+     * 观察者
+     * @param vm
+     * @param node
+     * @param name
+     * @constructor
+     */
+    function Watcher(vm,node,name) {
+        Moniter.target=this;
+        this.node=node;
+        this.name=name;
+        this.vm=vm;
+        //初始化数据和注册观察者
+        this.update();
+        Moniter.target=null;
+    }
+    //更新数据
+    Watcher.prototype.update=function () {
+        //第一次调用时就是触发数据的get方法去初始化数据和注册观察者。之后时更新数据
+        this.node.nodeValue=this.vm[this.name];
+    };
+    /**
+     * 监听者
+     * @constructor
+     */
+    function Moniter() {
+        this.watchers=[];
+    }
+    Moniter.prototype.dispatch=function () {
+        this.watchers.forEach(function (watcher) {
+            watcher.update();
+        })
+    };
+    Moniter.prototype.addWatcher=function (target) {
+        this.watchers.push(target);
+    };
+
+    let  vm=new Vue({
+        el:'app',
+        data:{
+            text:'hello world'
+        }
+    });
+    /**
+     * vue类
+     * @param options - 配置的数据
+     * @constructor
+     */
+    function Vue(options) {
+        //将响应式数据与vue实例关联
+        this.data=options.data;
+        //获取vue的根节点
+        let root=document.getElementById(options.el);
+        //数据劫持
+        defineReactive(this);
+        //编译模板
+        root.appendChild(nodeToFramge(root,this));
+    }
+    /**
+     * 数据劫持
+     * @param vm
+     */
+    function defineReactive(vm) {
+        Object.keys(vm.data).forEach(function (name) {
+            //保存未被访问器属性覆时，数据属性的值。
+            let value=vm.data[name];
+            let mo=new Moniter();
+            Object.defineProperty(vm,name,{
+                set:function (newValue) {
+                    if(value===newValue) return;
+                    //触发观察者实现数据更新
+                    value=newValue;
+                    mo.dispatch();
+                },
+                get:function () {
+                    //判断是否时初始化数据，然后注册观察者
+                    if(Moniter.target) mo.addWatcher(Moniter.target);
+                    return value;
+                }
+            })
+        })
+    }
+    /**
+     *编译模板
+     * @param node - vue管理的节点
+     * @param vm - vue实例
+     */
+    function compile(node,vm) {
+        //节点类型为元素
+        if(node.nodeType===1){
+            let attr=node.attributes;
+            //遍历解析html的属性
+            for(let i=0;i<attr.length;i++){
+                //v-m的数据响应
+                if(attr[i].nodeName==='v-model'){
+                    //获取html属性的值，也就是响应式数据的键名
+                    let name=attr[i].nodeValue;
+                    //初始化输入控件的数据
+                    node.value=vm[name];
+                    //监听数据的变化，实现v-m的数据响应
+                    node.addEventListener('input',function (e) {
+                        vm[name]=e.target.value;
+                    });
+                    //删除v-model自定义属性
+                    node.removeAttribute('v-model');
+                }
+            }
+        }
+        //节点为文本类型
+        else if(node.nodeType===3){
+            //识别响应式数据的正则表达式
+            let reg=/\{\{(.*)\}\}/;
+            //找出响应式数据
+            if(reg.test(node.nodeValue)){
+                //从正则表达式的子表达式中获取响应式数据的键名
+                let name=RegExp.$1.trim();
+                //创建观察者
+                new Watcher(vm,node,name);
+            }
+        }
+    }
+    /**
+     * 节点转换成节点片段，优化动态改变节点的性能
+     * @param root - vue的根节点
+     * @param vm - vue实例
+     */
+    function nodeToFramge(root,vm) {
+        let df=document.createDocumentFragment();
+        let node;
+        //不断的把vue要管理的dom元素放到document Fragment中。
+        while(node=root.firstChild){
+            //优化dom操作性能问题。
+            df.appendChild(node);
+            //进行dom的解析，也可以理解成编译吧
+            compile(node,vm);
+        }
+        return df;
+    }
+</script>
+</html>

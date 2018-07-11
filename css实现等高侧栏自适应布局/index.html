@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    *{
+        margin: 0;
+        padding:0;
+    }
+    /*父布局*/
+    .container{
+        height: 100vh;
+        width: 100vw;
+        background: #7d8285;
+    }
+    /*主内容自适应*/
+    .main{
+        background: aqua;
+    }
+    /*侧边固定宽度*/
+    .aside{
+        width: 200px;
+        background: bisque;
+    }
+
+    /*第一种方法：弹性布局*/
+    .flex{
+        display: flex;
+        /*默认的align-items的值是设置子布局等于父布局高度，这样就可以是实现等高*/
+        /*align-items: stretch;*/
+    }
+    .flex_main{
+        flex-grow: 1;
+    }
+
+    /*第二种方法：table布局*/
+    .table{
+        display: table;
+    }
+    .table .table-cell{
+        /*table父布局中的table-cell高度等与父布局高都，没有固定宽度的table-cell自适应*/
+        display: table-cell;
+    }
+
+    /*第三种方法： bfc布局*/
+    .bfc_main{
+        overflow: hidden;
+    }
+    .float{
+        float:right;
+    }
+    ._margin{
+        padding-bottom: 100vh;
+        margin-bottom: -100vh;
+    }
+</style>
+<body>
+<div class="container bfc">
+    <div class="main _margin bfc_main"></div>
+    <div class="aside _margin float"></div>
+</div>
+</body>
+</html>
