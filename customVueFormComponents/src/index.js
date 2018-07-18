@@ -1,11 +1,11 @@
 /**
  * 批量将组件作为vue的插件
  */
-import uiSwitch from './packages/customSwitch/customSwitch';
-import customInput from './packages/customInput/customInput';
-import customCheckBox from './packages/customCheckBox/customCheckBox';
-import customSelect from './packages/customSelect/customSelect';
-import customOption from './packages/customSelect/customOption';
+import uiSwitch from './components/customSwitch/customSwitch';
+import customInput from './components/customInput/customInput';
+import customCheckBox from './components/customCheckBox/customCheckBox';
+import customSelect from './components/customSelect/customSelect';
+import customOption from './components/customSelect/customOption';
 
 const components=[
   uiSwitch,
